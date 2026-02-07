@@ -1,10 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ConnectWallet from './ConnectWallet';
 
 export default function Navbar() {
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check for saved wallet address
+    const savedAddress = localStorage.getItem('walletAddress');
+    if (savedAddress) {
+      setWalletAddress(savedAddress);
+    }
+
+    // Listen for storage changes (when wallet is connected/disconnected)
+    const handleStorageChange = () => {
+      const savedAddress = localStorage.getItem('walletAddress');
+      setWalletAddress(savedAddress);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for changes in the same tab
+    const interval = setInterval(handleStorageChange, 500);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const truncateAddress = (address: string) => {
+    if (address.length <= 10) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const handleModalClose = () => {
+    // Refresh wallet address when modal closes
+    const savedAddress = localStorage.getItem('walletAddress');
+    setWalletAddress(savedAddress);
+    setShowWalletModal(false);
+  };
 
   return (
     <nav className="border-b border-[#2a2a2a] bg-[#0a0a0a]/90 backdrop-blur-sm sticky top-0 z-50">
@@ -88,7 +125,7 @@ export default function Navbar() {
                   d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              Connect Wallet
+              {walletAddress ? truncateAddress(walletAddress) : 'Connect Wallet'}
             </button>
           </div>
         </div>
@@ -97,7 +134,7 @@ export default function Navbar() {
       {/* Wallet Modal */}
       <ConnectWallet
         isOpen={showWalletModal}
-        onClose={() => setShowWalletModal(false)}
+        onClose={handleModalClose}
       />
     </nav>
   );
