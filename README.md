@@ -13,7 +13,7 @@ A full-stack prediction market aggregator that tracks and displays price differe
 ## Project Structure
 
 ```
-Predication-Market/
+Prediction-Market/
 ├── backend/           # FastAPI Python backend
 │   ├── main.py        # Main API server
 │   ├── mock_data.py   # Mock data generator (for demo)
