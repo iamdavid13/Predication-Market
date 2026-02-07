@@ -172,3 +172,63 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## Support
 
 For issues or questions, please open an issue on GitHub.
+
+## Troubleshooting
+
+### Issue: Can't see the site at localhost:3000
+
+If you're unable to access the site at `http://localhost:3000`, follow these steps:
+
+1. **Check if both servers are running:**
+   - Backend should be running on port 8000
+   - Frontend should be running on port 3000
+
+2. **Verify backend is running:**
+   ```bash
+   curl http://localhost:8000/api/health
+   ```
+   You should see: `{"status":"healthy","timestamp":"..."}`
+
+3. **Check if frontend dependencies are installed:**
+   ```bash
+   cd frontend
+   ls node_modules
+   ```
+   If `node_modules` doesn't exist, run: `npm install`
+
+4. **Restart the servers:**
+   
+   **Backend:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   python3 main.py
+   ```
+   
+   **Frontend (in a new terminal):**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+5. **Check if ports are already in use:**
+   ```bash
+   # Check port 3000
+   lsof -i :3000
+   
+   # Check port 8000
+   lsof -i :8000
+   ```
+   
+   If ports are in use by other processes, either stop those processes or change the port numbers.
+
+6. **Verify you're in the correct directory:**
+   Make sure you're running commands from the project root directory or the appropriate subdirectory (backend or frontend).
+
+### Common Solutions
+
+- **Backend not starting:** Ensure Python dependencies are installed: `pip install -r backend/requirements.txt`
+- **Frontend not starting:** Delete `node_modules` and reinstall: `rm -rf frontend/node_modules && cd frontend && npm install`
+- **Connection refused:** Make sure both servers are running before accessing localhost:3000
+- **Blank page:** Check browser console for errors and ensure backend API is accessible
