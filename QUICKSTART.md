@@ -7,6 +7,16 @@ This guide will help you get the UnusualProbs site running at localhost:3000 in 
 - Node.js 18+
 - npm
 
+## Important: Install PMXT Sidecar (Required for Real-Time Data)
+
+For real-time market data from Polymarket and Kalshi, install the pmxt sidecar server globally:
+
+```bash
+npm install -g pmxtjs
+```
+
+**Note:** Without this, the app will fall back to mock data. The pmxt library requires this Node.js server to interact with prediction markets.
+
 ## Step-by-Step Instructions
 
 ### 1. Clone the Repository (if you haven't already)

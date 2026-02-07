@@ -48,17 +48,27 @@ Prediction-Market/
 
 ### Backend Setup
 
-1. Navigate to the backend directory:
+1. **Install PMXT Sidecar (Required for Real-Time Data):**
+
+The pmxt Python library requires a Node.js sidecar server to be installed globally:
+
+```bash
+npm install -g pmxtjs
+```
+
+**Important:** Without this, the backend will fall back to mock data. The pmxt library uses this server to interact with Polymarket and Kalshi APIs.
+
+2. Navigate to the backend directory:
 ```bash
 cd backend
 ```
 
-2. Install Python dependencies:
+3. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the backend server:
+4. Run the backend server:
 ```bash
 python main.py
 ```
@@ -232,3 +242,40 @@ If you're unable to access the site at `http://localhost:3000`, follow these ste
 - **Frontend not starting:** Delete `node_modules` and reinstall: `rm -rf frontend/node_modules && cd frontend && npm install`
 - **Connection refused:** Make sure both servers are running before accessing localhost:3000
 - **Blank page:** Check browser console for errors and ensure backend API is accessible
+- **Using mock data instead of real data:** Install pmxtjs globally: `npm install -g pmxtjs` and restart the backend
+
+### Issue: Backend shows "Using mock data" instead of real market data
+
+The backend requires the pmxt library with its Node.js sidecar to fetch real-time data from Polymarket and Kalshi.
+
+**Solution:**
+
+1. **Install the pmxtjs sidecar server:**
+   ```bash
+   npm install -g pmxtjs
+   ```
+
+2. **Verify pmxt is in requirements.txt:**
+   ```bash
+   cd backend
+   cat requirements.txt | grep pmxt
+   ```
+   You should see: `pmxt>=0.1.0`
+
+3. **Reinstall Python dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Restart the backend server:**
+   ```bash
+   python3 main.py
+   ```
+
+5. **Verify real data is being fetched:**
+   Check the console output when starting the backend. If pmxt imports successfully, you'll see different market data than the mock data.
+
+**Note:** The pmxt library automatically starts the sidecar server when needed. If you see errors about connection refused or server not starting, make sure:
+- Node.js 18+ is installed
+- pmxtjs is installed globally
+- No firewall is blocking local connections
