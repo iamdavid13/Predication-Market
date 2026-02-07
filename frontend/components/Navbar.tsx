@@ -14,20 +14,16 @@ export default function Navbar() {
       setWalletAddress(savedAddress);
     }
 
-    // Listen for storage changes (when wallet is connected/disconnected)
+    // Listen for storage changes (from other tabs)
     const handleStorageChange = () => {
       const savedAddress = localStorage.getItem('walletAddress');
       setWalletAddress(savedAddress);
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also check periodically for changes in the same tab
-    const interval = setInterval(handleStorageChange, 500);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
     };
   }, []);
 
