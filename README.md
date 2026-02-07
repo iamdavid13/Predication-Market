@@ -193,7 +193,7 @@ Before deploying to production, ensure you:
 
 1. ✅ Update CORS to allow only your frontend domain
 2. ✅ Set `NEXT_PUBLIC_API_URL` environment variable
-3. ✅ Upgrade Next.js to the latest patched version
+3. ✅ Use Next.js 15.0.8 or higher (all known vulnerabilities patched)
 4. ✅ Review and sanitize error logging to avoid exposing sensitive information
 5. ✅ Use HTTPS for both frontend and backend
 6. ✅ Consider rate limiting on API endpoints
@@ -213,8 +213,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 ```bash
 cd frontend
-# Upgrade Next.js to latest patched version
-npm install next@latest
+# Next.js is already at 15.5.12 which has all security patches
 # Set API URL
 export NEXT_PUBLIC_API_URL=https://your-api-domain.com
 npm run build
