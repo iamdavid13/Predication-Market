@@ -29,7 +29,7 @@ if USE_REAL_API:
     matcher = EventMatcher()
 
 
-def calculate_spread(polymarket_price: float, kalshi_price: float) -> float:
+def calculate_spread(polymarket_price: float | None, kalshi_price: float | None) -> float:
     """Calculate the spread between two prices as a percentage."""
     if polymarket_price is None or kalshi_price is None:
         return 0.0
