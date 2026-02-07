@@ -4,7 +4,7 @@ A full-stack application that aggregates and compares prediction markets from Po
 
 ## Features
 
-- 🔄 Real-time data fetching from Polymarket and Kalshi using pmxt
+- 🔄 Real-time data fetching from Polymarket and Kalshi via public APIs
 - 🤖 Background task that refreshes market data every 60 seconds
 - 🔍 Fuzzy string matching to identify the same events across platforms
 - 📊 Spread calculation between market prices
@@ -13,12 +13,13 @@ A full-stack application that aggregates and compares prediction markets from Po
   - **Neon Red**: High divergence (>8% spread)
   - **Emerald Green**: Arbitrage opportunities (>3% spread)
 - ⚡ Live-updating table with 5-second polling
+- 📱 Responsive design that works on all devices
 
 ## Tech Stack
 
 ### Backend
 - **FastAPI**: Modern Python web framework
-- **pmxt**: Library for fetching market data from Polymarket and Kalshi
+- **httpx**: Async HTTP client for API calls
 - **thefuzz**: Fuzzy string matching for market comparison
 - **Uvicorn**: ASGI server
 
@@ -128,12 +129,14 @@ Then open `http://localhost:3000` in your browser.
 ### Data Flow
 
 1. **Background Task**: On startup, FastAPI initiates a background task that runs every 60 seconds
-2. **Data Fetching**: The task fetches active markets from both Polymarket and Kalshi using the pmxt library
+2. **Data Fetching**: The task attempts to fetch active markets from both Polymarket and Kalshi via their public APIs. If the APIs are unavailable (e.g., in development/sandboxed environments), it falls back to mock data for demonstration.
 3. **Fuzzy Matching**: Markets are compared using fuzzy string matching (token_sort_ratio) to find the same events
 4. **Spread Calculation**: For matched markets, the price difference (spread) is calculated
 5. **API Exposure**: Matched markets are exposed via REST API endpoints
 6. **Frontend Polling**: The Next.js frontend polls the API every 5 seconds for live updates
 7. **Visual Highlighting**: Markets are color-coded based on spread percentage
+
+> **Note**: The current implementation uses mock data when API access is unavailable. In production with proper API access, the application will fetch real-time market data from Polymarket and Kalshi.
 
 ### Matching Algorithm
 
