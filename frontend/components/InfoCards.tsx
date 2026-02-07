@@ -37,12 +37,15 @@ export default function InfoCards({ markets }: InfoCardsProps) {
           <div className="text-4xl font-bold text-white mb-2">
             {liveOpportunities}
           </div>
-          <div className="flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors cursor-pointer">
+          <button 
+            className="flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors cursor-pointer bg-transparent border-none p-0"
+            onClick={() => {/* TODO: Navigate to arbitrage plays */}}
+          >
             Active Arbitrage Plays
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7v10" />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -64,12 +67,15 @@ export default function InfoCards({ markets }: InfoCardsProps) {
           <div className="text-4xl font-bold text-white mb-2">
             {highVolatilityCount}
           </div>
-          <div className="flex items-center gap-1 text-sm text-red-400 hover:text-red-300 transition-colors cursor-pointer">
+          <button 
+            className="flex items-center gap-1 text-sm text-red-400 hover:text-red-300 transition-colors cursor-pointer bg-transparent border-none p-0"
+            onClick={() => {/* TODO: Navigate to high volatility markets */}}
+          >
             Markets with &gt;8% Spread
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7v10" />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
 

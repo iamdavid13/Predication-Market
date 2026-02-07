@@ -146,7 +146,6 @@ export default function MarketsTable({ onMarketsUpdate }: MarketsTableProps) {
                           {market.question}
                         </p>
                         <div className="flex items-center gap-3 text-xs">
-                          <span className="text-gray-500">Vol: $2.4M</span>
                           <div className="flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                             <span className="text-gray-500">
