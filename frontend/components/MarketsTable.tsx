@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getApiBaseUrl } from '../lib/api';
 
 interface Market {
   id: string;
@@ -30,10 +31,11 @@ export default function MarketsTable({ onMarketsUpdate }: MarketsTableProps) {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const apiBaseUrl = getApiBaseUrl();
 
   const fetchMarkets = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/markets');
+      const response = await fetch(`${apiBaseUrl}/api/markets`);
       const data: ApiResponse = await response.json();
       
       if (data.success) {

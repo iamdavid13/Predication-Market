@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import InfoCards from '../components/InfoCards';
 import MarketsTable from '../components/MarketsTable';
+import TradesTable from '../components/TradesTable';
 
 interface Market {
   spread: number;
@@ -78,6 +79,17 @@ export default function Home() {
 
           {/* Markets Table */}
           <MarketsTable onMarketsUpdate={setMarkets} />
+        </div>
+
+        {/* Recent Trades Section */}
+        <div className="space-y-4 mt-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <span>🧾</span>
+              Recent Trades
+            </h2>
+          </div>
+          <TradesTable />
         </div>
 
         {/* Footer Info */}
