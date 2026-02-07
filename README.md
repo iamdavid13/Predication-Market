@@ -187,25 +187,57 @@ useEffect(() => {
 
 ## Production Deployment
 
+### Security Checklist
+
+Before deploying to production, ensure you:
+
+1. ✅ Update CORS to allow only your frontend domain
+2. ✅ Set `NEXT_PUBLIC_API_URL` environment variable
+3. ✅ Upgrade Next.js to the latest patched version
+4. ✅ Review and sanitize error logging to avoid exposing sensitive information
+5. ✅ Use HTTPS for both frontend and backend
+6. ✅ Consider rate limiting on API endpoints
+7. ✅ Add authentication if needed for API access
+
 ### Backend
+
 ```bash
 cd backend
 pip install -r requirements.txt
+# Set production environment variables
+export CORS_ORIGINS=https://your-frontend-domain.com
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
+# Upgrade Next.js to latest patched version
+npm install next@latest
+# Set API URL
+export NEXT_PUBLIC_API_URL=https://your-api-domain.com
 npm run build
 npm start
 ```
 
 ## Configuration
 
+### Environment Variables
+
+#### Frontend
+Create a `.env.local` file in the frontend directory (optional):
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+If not set, the frontend defaults to `http://localhost:8000`.
+
 ### CORS
 
-The backend allows all origins by default for development. For production, update the CORS middleware in `backend/main.py`:
+⚠️ **Security Note**: The backend allows all origins by default for development. **This is insecure for production.** 
+
+For production, update the CORS middleware in `backend/main.py`:
 
 ```python
 app.add_middleware(
@@ -219,10 +251,11 @@ app.add_middleware(
 
 ### API URL
 
-For production, update the API URL in `frontend/app/page.tsx`:
+For production, set the `NEXT_PUBLIC_API_URL` environment variable:
 
-```typescript
-const response = await fetch('https://your-api-domain.com/api/markets')
+```bash
+# In your production environment
+export NEXT_PUBLIC_API_URL=https://your-api-domain.com
 ```
 
 ## Troubleshooting

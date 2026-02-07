@@ -3,7 +3,7 @@ UnusualProbs - Prediction Market Aggregator
 FastAPI backend that fetches and compares markets from Polymarket and Kalshi
 """
 import asyncio
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import List, Dict, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -220,7 +220,7 @@ async def refresh_market_data():
             if polymarket_markets and kalshi_markets:
                 matched = match_markets(polymarket_markets, kalshi_markets)
                 market_data["markets"] = matched
-                market_data["last_update"] = datetime.utcnow().isoformat()
+                market_data["last_update"] = datetime.now(UTC).isoformat()
                 market_data["status"] = "success"
                 logger.info(f"Market data updated successfully. Found {len(matched)} matched markets.")
             else:
