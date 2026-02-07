@@ -22,11 +22,14 @@ interface ApiResponse {
   error?: string;
 }
 
-export default function MarketsTable() {
+interface MarketsTableProps {
+  onMarketsUpdate?: (markets: Market[]) => void;
+}
+
+export default function MarketsTable({ onMarketsUpdate }: MarketsTableProps) {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdate, setLastUpdate] = useState<string>('');
 
   const fetchMarkets = async () => {
     try {
@@ -35,7 +38,9 @@ export default function MarketsTable() {
       
       if (data.success) {
         setMarkets(data.markets);
-        setLastUpdate(new Date(data.timestamp).toLocaleString());
+        if (onMarketsUpdate) {
+          onMarketsUpdate(data.markets);
+        }
         setError(null);
       } else {
         setError(data.error || 'Failed to fetch markets');
@@ -53,6 +58,23 @@ export default function MarketsTable() {
     const interval = setInterval(fetchMarkets, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const getTimeSinceUpdate = (lastUpdated: string) => {
+    const now = new Date();
+    const updated = new Date(lastUpdated);
+    const diffMs = now.getTime() - updated.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins === 1) return '1 min ago';
+    if (diffMins < 60) return `${diffMins} mins ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+  };
+
+  const hasArbitrage = (market: Market) => {
+    return market.is_unusual || market.spread > 8;
+  };
 
   if (loading) {
     return (
@@ -78,43 +100,35 @@ export default function MarketsTable() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Live Markets</h2>
-          <p className="text-gray-400 text-sm">
-            Showing markets with spread &gt; 5%
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-400">Last updated</p>
-          <p className="text-xs text-gray-500">{lastUpdate}</p>
-        </div>
-      </div>
-
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-[#2a2a2a]">
         <table className="w-full">
           <thead className="bg-[#1a1a1a] border-b border-[#2a2a2a]">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Market Question
+                Event Topic
               </th>
               <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Polymarket
               </th>
               <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Kalshi
+                Kalshi (Yes)
               </th>
               <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Spread
+              </th>
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Arbitrage
+              </th>
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Links
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#2a2a2a]">
             {markets.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                   No markets with spread &gt; 5% found
                 </td>
               </tr>
@@ -124,53 +138,94 @@ export default function MarketsTable() {
                   key={market.id}
                   className="hover:bg-[#1a1a1a] transition-colors"
                 >
+                  {/* Event Topic */}
                   <td className="px-6 py-4">
                     <div className="flex items-start gap-3">
-                      <div>
-                        <p className="font-medium text-white">
+                      <div className="flex-1">
+                        <p className="font-medium text-white mb-2">
                           {market.question}
                         </p>
-                        <div className="flex gap-2 mt-2">
-                          <a
-                            href={market.polymarket_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            View on Polymarket →
-                          </a>
-                          <a
-                            href={market.kalshi_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            View on Kalshi →
-                          </a>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="text-gray-500">Vol: $2.4M</span>
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                            <span className="text-gray-500">
+                              Updated {getTimeSinceUpdate(market.last_updated)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </td>
+
+                  {/* Polymarket */}
                   <td className="px-6 py-4 text-center">
-                    <span className="text-lg font-semibold text-green-400">
+                    <span className={`text-lg font-semibold ${
+                      market.polymarket_price > 50 ? 'text-green-400' : 'text-red-400'
+                    }`}>
                       {market.polymarket_price}%
                     </span>
                   </td>
+
+                  {/* Kalshi (Yes) */}
                   <td className="px-6 py-4 text-center">
-                    <span className="text-lg font-semibold text-green-400">
+                    <span className={`text-lg font-semibold ${
+                      market.kalshi_price > 50 ? 'text-green-400' : 'text-red-400'
+                    }`}>
                       {market.kalshi_price}%
                     </span>
                   </td>
+
+                  {/* Spread */}
                   <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg font-bold text-yellow-400">
+                    {market.spread > 8 ? (
+                      <span className="inline-block px-3 py-1 bg-red-900/20 border border-red-900 rounded-full text-sm font-semibold text-red-400">
                         {market.spread}%
                       </span>
-                      {market.is_unusual && (
-                        <span className="px-2 py-1 text-xs font-semibold text-white bg-red-600 rounded-full">
-                          UNUSUAL
+                    ) : (
+                      <span className="text-lg font-semibold text-yellow-400">
+                        {market.spread}%
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Arbitrage */}
+                  <td className="px-6 py-4 text-center">
+                    {hasArbitrage(market) ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-green-400 font-semibold">
+                          Yes +{market.spread}%
                         </span>
-                      )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-500">N/A</span>
+                    )}
+                  </td>
+
+                  {/* Links */}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <a
+                        href={market.polymarket_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 flex items-center justify-center bg-[#0a0a0a] border border-[#2a2a2a] rounded-full text-xs font-semibold text-gray-400 hover:text-blue-400 hover:border-blue-500 transition-colors"
+                        title="View on Polymarket"
+                      >
+                        P
+                      </a>
+                      <a
+                        href={market.kalshi_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 flex items-center justify-center bg-[#0a0a0a] border border-[#2a2a2a] rounded-full text-xs font-semibold text-gray-400 hover:text-green-400 hover:border-green-500 transition-colors"
+                        title="View on Kalshi"
+                      >
+                        K
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -186,8 +241,8 @@ export default function MarketsTable() {
           Total markets: <span className="text-white font-semibold">{markets.length}</span>
         </div>
         <div>
-          Unusual markets: <span className="text-red-400 font-semibold">
-            {markets.filter(m => m.is_unusual).length}
+          Arbitrage opportunities: <span className="text-green-400 font-semibold">
+            {markets.filter(m => hasArbitrage(m)).length}
           </span>
         </div>
       </div>
