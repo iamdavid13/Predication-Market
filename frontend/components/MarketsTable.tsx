@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../lib/api';
 
 interface Market {
@@ -33,7 +33,7 @@ export default function MarketsTable({ onMarketsUpdate }: MarketsTableProps) {
   const [error, setError] = useState<string | null>(null);
   const apiBaseUrl = getApiBaseUrl();
 
-  const fetchMarkets = async () => {
+  const fetchMarkets = useCallback(async () => {
     try {
       const response = await fetch(`${apiBaseUrl}/api/markets`);
       const data: ApiResponse = await response.json();
@@ -47,19 +47,19 @@ export default function MarketsTable({ onMarketsUpdate }: MarketsTableProps) {
       } else {
         setError(data.error || 'Failed to fetch markets');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to API');
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiBaseUrl, onMarketsUpdate]);
 
   useEffect(() => {
     fetchMarkets();
     // Auto-refresh every 30 seconds
     const interval = setInterval(fetchMarkets, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchMarkets]);
 
   const getTimeSinceUpdate = (lastUpdated: string) => {
     const now = new Date();

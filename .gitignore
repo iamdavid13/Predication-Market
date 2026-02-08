@@ -1,0 +1,14 @@
+# Environment variables (API keys)
+.env
+*.env
+backend/kalshi_private_key.pem
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# Node
+node_modules/
+.next/

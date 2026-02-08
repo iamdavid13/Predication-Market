@@ -8,17 +8,30 @@ interface ConnectWalletProps {
 }
 
 export default function ConnectWallet({ isOpen, onClose }: ConnectWalletProps) {
-  const [walletAddress, setWalletAddress] = useState('');
-  const [inputValue, setInputValue] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('walletAddress') || '';
+  });
+  const [inputValue, setInputValue] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('walletAddress') || '';
+  });
+  const [isConnected, setIsConnected] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return Boolean(localStorage.getItem('walletAddress'));
+  });
 
   useEffect(() => {
-    // Load wallet address from localStorage on mount
-    const savedAddress = localStorage.getItem('walletAddress');
-    if (savedAddress) {
-      setWalletAddress(savedAddress);
-      setIsConnected(true);
-    }
+    if (typeof window === 'undefined') return undefined;
+
+    const handleStorage = () => {
+      const saved = localStorage.getItem('walletAddress') || '';
+      setWalletAddress(saved);
+      setIsConnected(Boolean(saved));
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const handleSave = () => {
@@ -37,11 +50,6 @@ export default function ConnectWallet({ isOpen, onClose }: ConnectWalletProps) {
     setIsConnected(false);
     setInputValue('');
     onClose();
-  };
-
-  const truncateAddress = (address: string) => {
-    if (address.length <= 10) return address;
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   if (!isOpen) return null;

@@ -1,20 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import ConnectWallet from './ConnectWallet';
 
 export default function Navbar() {
   const [showWalletModal, setShowWalletModal] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletAddress, setWalletAddress] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('walletAddress');
+  });
 
   useEffect(() => {
-    // Check for saved wallet address
-    const savedAddress = localStorage.getItem('walletAddress');
-    if (savedAddress) {
-      setWalletAddress(savedAddress);
-    }
+    if (typeof window === 'undefined') return undefined;
 
-    // Listen for storage changes (from other tabs)
     const handleStorageChange = () => {
       const savedAddress = localStorage.getItem('walletAddress');
       setWalletAddress(savedAddress);
@@ -46,7 +46,7 @@ export default function Navbar() {
           {/* Left: Brand and Navigation */}
           <div className="flex items-center gap-8">
             {/* Brand */}
-            <div className="flex items-center gap-3">
+            <Link href="/home" className="flex items-center gap-3">
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                   UnusualProbs
@@ -55,27 +55,10 @@ export default function Navbar() {
                   Market Aggregator
                 </p>
               </div>
-            </div>
+            </Link>
 
             {/* Navigation Links */}
-            <div className="hidden lg:flex items-center gap-6 text-sm">
-              <button className="flex items-center gap-2 text-green-400 font-medium hover:text-green-300 transition-colors">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                Live
-              </button>
-              <button className="text-gray-400 hover:text-white transition-colors">
-                Markets
-              </button>
-              <button className="text-gray-400 hover:text-white transition-colors">
-                Divergence
-              </button>
-              <button className="text-gray-400 hover:text-white transition-colors">
-                Arbitrage
-              </button>
-              <button className="text-gray-400 hover:text-white transition-colors">
-                Whale Watch
-              </button>
-            </div>
+            <NavLinks />
           </div>
 
           {/* Center: Search Bar */}
@@ -133,5 +116,45 @@ export default function Navbar() {
         onClose={handleModalClose}
       />
     </nav>
+  );
+}
+
+function NavLinks() {
+  const pathname = usePathname();
+
+  const links = [
+    { href: '/home', label: 'Home', hasIndicator: false },
+    { href: '/markets', label: 'Markets', hasIndicator: false },
+    { href: '/insiders', label: 'Potential Insiders', hasIndicator: false },
+    { href: '/trades', label: 'Live Trades', hasIndicator: true },
+    { href: '/whales', label: 'Top Whales', hasIndicator: false },
+    { href: '#', label: 'Divergence', hasIndicator: false },
+    { href: '#', label: 'Arbitrage', hasIndicator: false },
+  ];
+
+  return (
+    <div className="hidden lg:flex items-center gap-6 text-sm">
+      {links.map(link => {
+        const isActive = pathname.startsWith(link.href) && link.href !== '#';
+        return (
+          <Link
+            key={link.label}
+            href={link.href}
+            className={`flex items-center gap-2 transition-colors ${
+              isActive
+                ? link.hasIndicator
+                  ? 'text-green-400 font-medium'
+                  : 'text-white font-medium'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            {link.hasIndicator && isActive && (
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            )}
+            {link.label}
+          </Link>
+        );
+      })}
+    </div>
   );
 }

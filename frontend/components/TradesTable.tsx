@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getApiBaseUrl } from '../lib/api';
 
 interface Trade {
@@ -27,7 +27,7 @@ export default function TradesTable() {
   const [error, setError] = useState<string | null>(null);
   const apiBaseUrl = getApiBaseUrl();
 
-  const fetchTrades = async () => {
+  const fetchTrades = useCallback(async () => {
     try {
       const response = await fetch(`${apiBaseUrl}/api/trades`);
       const data: ApiResponse = await response.json();
@@ -38,18 +38,18 @@ export default function TradesTable() {
       } else {
         setError(data.error || 'Failed to fetch trades');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to API');
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiBaseUrl]);
 
   useEffect(() => {
     fetchTrades();
     const interval = setInterval(fetchTrades, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchTrades]);
 
   const formatTime = (value: string) => {
     const date = new Date(value);
