@@ -2,6 +2,8 @@
 .env
 *.env
 backend/kalshi_private_key.pem
+backend/kalshi_private.pem
+backend/*.pem
 
 # Python
 __pycache__/
