@@ -14,3 +14,9 @@ venv/
 # Node
 node_modules/
 .next/
+
+# Local secret files
+backend/.env
+backend/.env.local
+backend/.keys/
+*.pem

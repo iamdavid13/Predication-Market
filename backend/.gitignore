@@ -11,3 +11,6 @@ pip-log.txt
 pip-delete-this-directory.txt
 .env
 .env.local
+
+predication-market.zip
+predication-market-clean.zip

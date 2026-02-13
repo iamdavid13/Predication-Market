@@ -128,6 +128,7 @@ function NavLinks() {
     { href: '/insiders', label: 'Potential Insiders', hasIndicator: false },
     { href: '/trades', label: 'Live Trades', hasIndicator: true },
     { href: '/whales', label: 'Top Whales', hasIndicator: false },
+    { href: '/polymarket-bot', label: 'Polymarket Bot', hasIndicator: false },
     { href: '#', label: 'Divergence', hasIndicator: false },
     { href: '#', label: 'Arbitrage', hasIndicator: false },
   ];

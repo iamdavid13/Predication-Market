@@ -23,7 +23,20 @@ class PMXTDataFetcher:
     
     def __init__(self, kalshi_api_key: str = None, kalshi_private_key_path: str = None):
         """Initialize pmxt clients. Uses Kalshi API key if provided for better rate limits."""
-        self.polymarket = Polymarket(private_key=None, auto_start_server=True)
+        # Load Polymarket private key if provided via env or path
+        poly_key_path = os.getenv('POLY_PRIVATE_KEY_PATH')
+        poly_key_inline = os.getenv('POLY_PRIVATE_KEY')
+        poly_private_key = None
+        if poly_key_inline:
+            poly_private_key = poly_key_inline
+        elif poly_key_path and os.path.exists(poly_key_path):
+            try:
+                with open(poly_key_path, 'r', encoding='utf-8') as f:
+                    poly_private_key = f.read()
+            except Exception:
+                poly_private_key = None
+
+        self.polymarket = Polymarket(private_key=poly_private_key, auto_start_server=True)
         self.kalshi_api_key = kalshi_api_key
         self.kalshi_private_key_path = kalshi_private_key_path
         self.kalshi_private_key = self._load_private_key(kalshi_private_key_path)
@@ -40,6 +53,10 @@ class PMXTDataFetcher:
             print("✅ Kalshi private key loaded — signed requests enabled")
         elif kalshi_private_key_path:
             print("⚠️  Kalshi private key path set but could not be loaded")
+        if poly_private_key:
+            print("✅ Polymarket private key loaded — live orders enabled for Polymarket client")
+        else:
+            print("⚠️  No Polymarket private key — Polymarket client will be read-only")
 
         # Optional Kalshi WebSocket for live trades
         self.enable_kalshi_ws = os.getenv("ENABLE_KALSHI_WS", "false").lower() == "true"
