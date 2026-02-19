@@ -20,3 +20,5 @@ backend/.env
 backend/.env.local
 backend/.keys/
 *.pem
+predication-market.zip
+predication-market-clean.zip
